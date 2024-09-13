@@ -1,0 +1,472 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Dioxus API Integration and Data Fetching - dioxus-odin</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../chapter_1.html"><strong aria-hidden="true">1.</strong> Chapter 1</a></li><li class="chapter-item expanded "><a href="../lessons/index.html"><strong aria-hidden="true">2.</strong> Odin for Dioxus</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../lessons/rust-basics-lesson.html"><strong aria-hidden="true">2.1.</strong> Introduction to Rust Basics</a></li><li class="chapter-item expanded "><a href="../lessons/web-dev-fundamentals-lesson.html"><strong aria-hidden="true">2.2.</strong> Web Dev Fundamentals</a></li><li class="chapter-item expanded "><a href="../lessons/intro-to-dioxus-lesson.html"><strong aria-hidden="true">2.3.</strong> Introduction to Dioxus</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-components-lifecycle-lesson.html"><strong aria-hidden="true">2.4.</strong> Dioxus Components Lifescycle</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-styling-lesson.html"><strong aria-hidden="true">2.5.</strong> Dioxus Styling</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-routing-lesson.html"><strong aria-hidden="true">2.6.</strong> Dioxus Routing</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-state-management-lesson.html"><strong aria-hidden="true">2.7.</strong> Dioxus State Management</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-forms-input-lesson.html"><strong aria-hidden="true">2.8.</strong> Dioxus Forms and User Input Handling</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-api-integration-lesson.html" class="active"><strong aria-hidden="true">2.9.</strong> Dioxus API Integration and Data Fetching</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">dioxus-odin</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="lesson-9-api-integration-and-data-fetching-in-dioxus"><a class="header" href="#lesson-9-api-integration-and-data-fetching-in-dioxus">Lesson 9: API Integration and Data Fetching in Dioxus</a></h1>
+<h2 id="objective"><a class="header" href="#objective">Objective</a></h2>
+<p>By the end of this lesson, you will understand how to integrate external APIs, fetch data asynchronously, and manage loading and error states in Dioxus applications.</p>
+<h2 id="1-setting-up"><a class="header" href="#1-setting-up">1. Setting Up</a></h2>
+<p>First, add the necessary dependencies to your <code>Cargo.toml</code>:</p>
+<pre><code class="language-toml">[dependencies]
+dioxus = "0.5.0"
+reqwest = { version = "0.11", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+</code></pre>
+<h2 id="2-basic-get-request"><a class="header" href="#2-basic-get-request">2. Basic GET Request</a></h2>
+<p>Let's start with a simple GET request using <code>reqwest</code>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use dioxus::prelude::*;
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
+struct Todo {
+    id: u32,
+    title: String,
+    completed: bool,
+}
+
+async fn fetch_todo(id: u32) -&gt; Result&lt;Todo, reqwest::Error&gt; {
+    let url = format!("https://jsonplaceholder.typicode.com/todos/{}", id);
+    reqwest::get(&amp;url).await?.json().await
+}
+
+fn TodoFetcher(cx: Scope) -&gt; Element {
+    let todo = use_future(cx, (), |_| async move {
+        fetch_todo(1).await
+    });
+
+    cx.render(rsx! {
+        div {
+            match todo.value() {
+                Some(Ok(todo)) =&gt; rsx! {
+                    h1 { "Todo" }
+                    p { "Title: {todo.title}" }
+                    p { "Completed: {todo.completed}" }
+                },
+                Some(Err(_)) =&gt; rsx! { p { "Error fetching todo" } },
+                None =&gt; rsx! { p { "Loading..." } },
+            }
+        }
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="3-handling-loading-and-error-states"><a class="header" href="#3-handling-loading-and-error-states">3. Handling Loading and Error States</a></h2>
+<p>Let's improve our example to better handle loading and error states:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug)]
+enum FetchState&lt;T&gt; {
+    NotStarted,
+    Loading,
+    Loaded(T),
+    Error(String),
+}
+
+fn ImprovedTodoFetcher(cx: Scope) -&gt; Element {
+    let mut fetch_state = use_state(cx, || FetchState::NotStarted);
+
+    let onclick = move |_| {
+        fetch_state.set(FetchState::Loading);
+        cx.spawn({
+            to_owned![fetch_state];
+            async move {
+                match fetch_todo(1).await {
+                    Ok(todo) =&gt; fetch_state.set(FetchState::Loaded(todo)),
+                    Err(e) =&gt; fetch_state.set(FetchState::Error(e.to_string())),
+                }
+            }
+        });
+    };
+
+    cx.render(rsx! {
+        div {
+            button { onclick: onclick, "Fetch Todo" }
+            match fetch_state.get() {
+                FetchState::NotStarted =&gt; rsx! { p { "Click the button to fetch a todo" } },
+                FetchState::Loading =&gt; rsx! { p { "Loading..." } },
+                FetchState::Loaded(todo) =&gt; rsx! {
+                    h1 { "Todo" }
+                    p { "Title: {todo.title}" }
+                    p { "Completed: {todo.completed}" }
+                },
+                FetchState::Error(err) =&gt; rsx! { p { "Error: {err}" } },
+            }
+        }
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="4-post-request"><a class="header" href="#4-post-request">4. POST Request</a></h2>
+<p>Now let's implement a POST request to create a new todo:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn create_todo(title: String) -&gt; Result&lt;Todo, reqwest::Error&gt; {
+    let client = reqwest::Client::new();
+    let new_todo = serde_json::json!({
+        "title": title,
+        "completed": false,
+    });
+    client.post("https://jsonplaceholder.typicode.com/todos")
+        .json(&amp;new_todo)
+        .send()
+        .await?
+        .json()
+        .await
+}
+
+fn TodoCreator(cx: Scope) -&gt; Element {
+    let mut title = use_state(cx, String::new);
+    let mut created_todo = use_state(cx, || None::&lt;Todo&gt;);
+
+    let onsubmit = move |evt: FormEvent| {
+        evt.prevent_default();
+        let title_value = title.get().clone();
+        cx.spawn({
+            to_owned![created_todo];
+            async move {
+                match create_todo(title_value).await {
+                    Ok(todo) =&gt; created_todo.set(Some(todo)),
+                    Err(e) =&gt; log::error!("Error creating todo: {}", e),
+                }
+            }
+        });
+    };
+
+    cx.render(rsx! {
+        form { onsubmit: onsubmit,
+            input {
+                value: "{title}",
+                oninput: move |evt| title.set(evt.value.clone()),
+            }
+            button { type: "submit", "Create Todo" }
+        }
+        {created_todo.get().as_ref().map(|todo| rsx! {
+            div {
+                h2 { "Created Todo" }
+                p { "Title: {todo.title}" }
+                p { "ID: {todo.id}" }
+            }
+        })}
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="5-cancelling-requests"><a class="header" href="#5-cancelling-requests">5. Cancelling Requests</a></h2>
+<p>To cancel ongoing requests when a component unmounts, we can use <code>AbortController</code>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use futures::future::AbortHandle;
+
+fn CancellableTodoFetcher(cx: Scope) -&gt; Element {
+    let abort_handle = use_state(cx, || None::&lt;AbortHandle&gt;);
+    let mut todo = use_state(cx, || None::&lt;Todo&gt;);
+
+    let fetch_todo = move |_| {
+        if let Some(handle) = abort_handle.get() {
+            handle.abort();
+        }
+        let (abort_registration, abort_handle) = AbortHandle::new_pair();
+        abort_handle.set(Some(abort_handle));
+
+        cx.spawn({
+            to_owned![todo];
+            async move {
+                let result = futures::future::Abortable::new(
+                    async { fetch_todo(1).await },
+                    abort_registration
+                ).await;
+                if let Ok(Ok(fetched_todo)) = result {
+                    todo.set(Some(fetched_todo));
+                }
+            }
+        });
+    };
+
+    use_effect(cx, (), |_| {
+        || {
+            if let Some(handle) = abort_handle.get() {
+                handle.abort();
+            }
+        }
+    });
+
+    cx.render(rsx! {
+        button { onclick: fetch_todo, "Fetch Todo" }
+        {todo.get().as_ref().map(|t| rsx! {
+            div {
+                h2 { "Fetched Todo" }
+                p { "Title: {t.title}" }
+            }
+        })}
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="6-pagination"><a class="header" href="#6-pagination">6. Pagination</a></h2>
+<p>Implementing pagination for a list of todos:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug, Deserialize)]
+struct TodoList(Vec&lt;Todo&gt;);
+
+async fn fetch_todos(page: u32, limit: u32) -&gt; Result&lt;TodoList, reqwest::Error&gt; {
+    let url = format!(
+        "https://jsonplaceholder.typicode.com/todos?_page={}&amp;_limit={}",
+        page, limit
+    );
+    reqwest::get(&amp;url).await?.json().await
+}
+
+fn PaginatedTodoList(cx: Scope) -&gt; Element {
+    let mut page = use_state(cx, || 1);
+    let todos = use_future(cx, page, |page| async move {
+        fetch_todos(*page, 10).await
+    });
+
+    cx.render(rsx! {
+        div {
+            button { onclick: move |_| page -= 1, disabled: "{*page == 1}", "Previous" }
+            button { onclick: move |_| page += 1, "Next" }
+            match todos.value() {
+                Some(Ok(TodoList(list))) =&gt; rsx! {
+                    ul {
+                        {list.iter().map(|todo| rsx! {
+                            li { key: "{todo.id}", "{todo.title}" }
+                        })}
+                    }
+                },
+                Some(Err(_)) =&gt; rsx! { p { "Error fetching todos" } },
+                None =&gt; rsx! { p { "Loading..." } },
+            }
+        }
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="practice-exercises"><a class="header" href="#practice-exercises">Practice Exercises</a></h2>
+<ol>
+<li>Create a weather app that fetches data from a weather API based on user input (city name or coordinates).</li>
+<li>Implement a GitHub user search feature that allows users to search for GitHub profiles and display basic user information.</li>
+<li>Build a simple blog application that fetches posts from an API, implements pagination, and allows users to create new posts.</li>
+</ol>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
+<ul>
+<li>Explore more advanced API integration patterns, such as caching and optimistic updates</li>
+<li>Learn about authentication and authorization in API requests</li>
+<li>In the next lesson, we'll cover testing Dioxus applications</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../lessons/dioxus-forms-input-lesson.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../lessons/dioxus-forms-input-lesson.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

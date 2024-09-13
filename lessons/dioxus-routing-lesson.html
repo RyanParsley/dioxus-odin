@@ -1,0 +1,401 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Dioxus Routing - dioxus-odin</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../chapter_1.html"><strong aria-hidden="true">1.</strong> Chapter 1</a></li><li class="chapter-item expanded "><a href="../lessons/index.html"><strong aria-hidden="true">2.</strong> Odin for Dioxus</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../lessons/rust-basics-lesson.html"><strong aria-hidden="true">2.1.</strong> Introduction to Rust Basics</a></li><li class="chapter-item expanded "><a href="../lessons/web-dev-fundamentals-lesson.html"><strong aria-hidden="true">2.2.</strong> Web Dev Fundamentals</a></li><li class="chapter-item expanded "><a href="../lessons/intro-to-dioxus-lesson.html"><strong aria-hidden="true">2.3.</strong> Introduction to Dioxus</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-components-lifecycle-lesson.html"><strong aria-hidden="true">2.4.</strong> Dioxus Components Lifescycle</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-styling-lesson.html"><strong aria-hidden="true">2.5.</strong> Dioxus Styling</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-routing-lesson.html" class="active"><strong aria-hidden="true">2.6.</strong> Dioxus Routing</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-state-management-lesson.html"><strong aria-hidden="true">2.7.</strong> Dioxus State Management</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-forms-input-lesson.html"><strong aria-hidden="true">2.8.</strong> Dioxus Forms and User Input Handling</a></li><li class="chapter-item expanded "><a href="../lessons/dioxus-api-integration-lesson.html"><strong aria-hidden="true">2.9.</strong> Dioxus API Integration and Data Fetching</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">dioxus-odin</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="lesson-6-routing-in-dioxus-applications"><a class="header" href="#lesson-6-routing-in-dioxus-applications">Lesson 6: Routing in Dioxus Applications</a></h1>
+<h2 id="objective"><a class="header" href="#objective">Objective</a></h2>
+<p>By the end of this lesson, you will understand how to implement client-side routing in Dioxus applications using the dioxus-router crate.</p>
+<h2 id="1-introduction-to-routing-in-dioxus"><a class="header" href="#1-introduction-to-routing-in-dioxus">1. Introduction to Routing in Dioxus</a></h2>
+<p>Routing allows you to create multi-page applications with different views based on the URL. Dioxus provides a powerful routing system through the dioxus-router crate.</p>
+<h2 id="2-setting-up-dioxus-router"><a class="header" href="#2-setting-up-dioxus-router">2. Setting up dioxus-router</a></h2>
+<p>First, add dioxus-router to your <code>Cargo.toml</code>:</p>
+<pre><code class="language-toml">[dependencies]
+dioxus = "0.5.0"
+dioxus-router = "0.5.0"
+</code></pre>
+<h2 id="3-basic-route-setup"><a class="header" href="#3-basic-route-setup">3. Basic Route Setup</a></h2>
+<p>Here's a basic example of setting up routes:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use dioxus::prelude::*;
+use dioxus_router::prelude::*;
+
+#[derive(Routable, Clone)]
+enum Route {
+    #[route("/")]
+    Home,
+    #[route("/about")]
+    About,
+    #[route("/contact")]
+    Contact,
+}
+
+fn App(cx: Scope) -&gt; Element {
+    cx.render(rsx! {
+        Router::&lt;Route&gt; {}
+    })
+}
+
+#[inline_props]
+fn Home(cx: Scope) -&gt; Element {
+    cx.render(rsx! {
+        h1 { "Home Page" }
+        Link { to: Route::About {}, "Go to About" }
+    })
+}
+
+#[inline_props]
+fn About(cx: Scope) -&gt; Element {
+    cx.render(rsx! {
+        h1 { "About Page" }
+        Link { to: Route::Contact {}, "Go to Contact" }
+    })
+}
+
+#[inline_props]
+fn Contact(cx: Scope) -&gt; Element {
+    cx.render(rsx! {
+        h1 { "Contact Page" }
+        Link { to: Route::Home {}, "Go to Home" }
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="4-nested-routes"><a class="header" href="#4-nested-routes">4. Nested Routes</a></h2>
+<p>You can create nested routes for more complex applications:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Routable, Clone)]
+enum Route {
+    #[route("/")]
+    Home,
+    #[route("/users")]
+    Users,
+    #[route("/users/:id")]
+    UserProfile { id: String },
+}
+
+#[inline_props]
+fn Users(cx: Scope) -&gt; Element {
+    cx.render(rsx! {
+        h1 { "Users Page" }
+        ul {
+            li { Link { to: Route::UserProfile { id: "1".to_string() }, "User 1" } }
+            li { Link { to: Route::UserProfile { id: "2".to_string() }, "User 2" } }
+        }
+    })
+}
+
+#[inline_props]
+fn UserProfile(cx: Scope, id: String) -&gt; Element {
+    cx.render(rsx! {
+        h1 { "User Profile" }
+        p { "User ID: {id}" }
+        Link { to: Route::Users {}, "Back to Users" }
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="5-route-parameters"><a class="header" href="#5-route-parameters">5. Route Parameters</a></h2>
+<p>As seen in the UserProfile example, you can use route parameters:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[route("/users/:id")]
+UserProfile { id: String },
+<span class="boring">}</span></code></pre></pre>
+<h2 id="6-query-parameters"><a class="header" href="#6-query-parameters">6. Query Parameters</a></h2>
+<p>You can also handle query parameters:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use dioxus_router::hooks::use_query;
+
+#[inline_props]
+fn SearchResults(cx: Scope) -&gt; Element {
+    let query = use_query(cx);
+    let search_term = query.get("q").unwrap_or("");
+
+    cx.render(rsx! {
+        h1 { "Search Results" }
+        p { "Searching for: {search_term}" }
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="7-navigation-guards"><a class="header" href="#7-navigation-guards">7. Navigation Guards</a></h2>
+<p>You can implement navigation guards to protect routes:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use dioxus_router::prelude::*;
+
+fn is_authenticated() -&gt; bool {
+    // Your authentication logic here
+    true
+}
+
+#[inline_props]
+fn ProtectedRoute(cx: Scope) -&gt; Element {
+    let navigator = use_navigator(cx);
+
+    if !is_authenticated() {
+        navigator.replace(Route::Login {});
+        return None;
+    }
+
+    cx.render(rsx! {
+        h1 { "Protected Content" }
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="8-404-not-found-route"><a class="header" href="#8-404-not-found-route">8. 404 Not Found Route</a></h2>
+<p>Handle unknown routes with a 404 page:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Routable, Clone)]
+enum Route {
+    #[route("/")]
+    Home,
+    #[route("/:..route")]
+    NotFound { route: Vec&lt;String&gt; },
+}
+
+#[inline_props]
+fn NotFound(cx: Scope, route: Vec&lt;String&gt;) -&gt; Element {
+    cx.render(rsx! {
+        h1 { "404 Not Found" }
+        p { "The page /{route.join("/")} does not exist." }
+        Link { to: Route::Home {}, "Go to Home" }
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="practice-exercises"><a class="header" href="#practice-exercises">Practice Exercises</a></h2>
+<ol>
+<li>Create a simple blog application with routes for a home page, post list, and individual post pages.</li>
+<li>Implement a user authentication system with protected routes and a login page.</li>
+<li>Build a product catalog with category and product detail pages, using nested routes and query parameters for filtering.</li>
+</ol>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
+<ul>
+<li>Explore more advanced routing scenarios, such as lazy loading routes</li>
+<li>Learn about integrating routing with state management in Dioxus</li>
+<li>In the next lesson, we'll cover state management techniques in Dioxus applications</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../lessons/dioxus-styling-lesson.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../lessons/dioxus-state-management-lesson.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../lessons/dioxus-styling-lesson.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../lessons/dioxus-state-management-lesson.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
