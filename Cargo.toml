@@ -12,6 +12,11 @@ test = "cargo test"
 lint = "cargo clippy"
 dev-book = "mdbook serve"
 
+[workspace]
+members = [
+    ".",
+]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

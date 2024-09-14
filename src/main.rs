@@ -15,7 +15,13 @@ fn main() {
     // Init logger
     dioxus_logger::init(tracing::Level::INFO).expect("failed to init logger");
     tracing::info!("starting app");
-    launch(App);
+
+    // Docker doesn't like 127.0.0.1
+    LaunchBuilder::fullstack()
+        .with_cfg(server_only!(
+            dioxus::fullstack::Config::new().addr(std::net::SocketAddr::from(([0, 0, 0, 0], 8080)))
+        ))
+        .launch(App);
 }
 
 fn App() -> Element {
