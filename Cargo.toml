@@ -4,6 +4,14 @@ version = "0.1.0"
 authors = ["Ryan Parsley <RMParsley@gmail.com>"]
 edition = "2021"
 
+[scripts]
+prebuild = "cargo fmt --check"
+build = "cargo run --script cargo build --release --depend prebuild,postbuild"
+postbuild = "cargo test"
+test = "cargo test"
+lint = "cargo clippy"
+dev-book = "mdbook serve"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
