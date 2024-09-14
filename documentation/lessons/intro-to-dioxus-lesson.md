@@ -26,7 +26,7 @@ cargo install dioxus-cli
 Create a new Dioxus project:
 
 ```sh
-dioxus create my_dioxus_app
+dx create my_dioxus_app
 cd my_dioxus_app
 ```
 
@@ -65,7 +65,7 @@ fn App(cx: Scope) -> Element {
 Run your app with:
 
 ```sh
-dioxus serve
+dx serve
 ```
 
 Visit `http://localhost:8080` in your browser to see your app.
