@@ -20,7 +20,15 @@ fn main() {
 
 fn App() -> Element {
     rsx! {
-        Router::<Route> {}
+        Router::<Route> {},
+        Footer {}
+    }
+}
+
+#[component]
+fn Footer() -> Element {
+    rsx! {
+        p { "I am the footer" }
     }
 }
 
